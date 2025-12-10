@@ -1,138 +1,161 @@
-/* Reset básico */
+/* ========= RESET ========= */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Corpo ocupa toda a altura e usa flexbox para empurrar o quadro para baixo */
 html, body {
   height: 100%;
+  background: linear-gradient(135deg, #eef2ff, #f8f9ff);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+    sans-serif;
+  color: #1a1a1a;
 }
 
+/* ========= LAYOUT GLOBAL ========= */
 body {
   display: flex;
-  justify-content: center; /* centraliza horizontalmente */
-  align-items: flex-start; /* empurra para baixo */
-  padding-top: 80px;       /* ajusta a altura do quadro */
-  background: linear-gradient(to bottom, #e0f7fa, #e1bee7);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
+  justify-content: center;
+  padding: 40px 20px;
 }
 
-/* Container principal */
-div {
-  max-width: 500px;
+main {
   width: 100%;
-  padding: 25px;
-  background: #ffffffcc; /* leve transparência */
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  max-width: 680px;
+  background: white;
+  padding: 36px;
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  animation: fadeIn 0.4s ease-out;
 }
 
-/* Título */
-h1 {
-  text-align: center;
-  margin-bottom: 25px;
-  color: #6a1b9a; /* roxo suave */
-  font-size: 28px;
+/* ========= ANIMAÇÕES ========= */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Inputs */
-input[type="text"] {
-  padding: 10px;
-  flex: 1;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+@keyframes softPop {
+  0%   { transform: scale(0.97); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ========= TITULOS ========= */
+h1, h2, h3 {
+  font-weight: 700;
+  margin-bottom: 14px;
+  background: linear-gradient(90deg, #4f46e5, #a855f7);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* ========= FORM GLOBAL ========= */
+input, textarea {
+  width: 100%;
+  padding: 14px 16px;
   font-size: 16px;
+  border: 1px solid rgba(120, 120, 180, 0.25);
+  border-radius: 12px;
+  outline: none;
+  transition: 0.25s ease;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.03);
 }
 
-/* Botões padrão */
+input:focus, textarea:focus {
+  border-color: #6d28d9;
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(1.01);
+}
+
+/* ========= BOTÕES ========= */
 button {
-  padding: 10px 16px;
-  border-radius: 8px;
+  cursor: pointer;
+  padding: 14px 20px;
+  border-radius: 12px;
   border: none;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.2s, transform 0.1s;
-}
-
-/* Botão Adicionar (primeiro botão dentro do container) */
-div > button:first-of-type {
-  background-color: #1e88e5;
+  font-size: 15px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
   color: white;
+  transition: 0.25s;
+  box-shadow: 0 4px 12px rgba(80,0,200,0.2);
 }
 
-div > button:first-of-type:hover {
-  background-color: #1565c0;
-  transform: translateY(-1px);
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(80,0,200,0.3);
 }
 
-/* Lista de tarefas */
-ul {
-  list-style: none;
-  padding-left: 0;
+button:active {
+  transform: translateY(0);
 }
 
-li {
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========= LISTA DE TAREFAS ========= */
+.task-item {
+  background: linear-gradient(135deg, #ffffff, #f9f7ff);
+  border: 1px solid rgba(120, 120, 180, 0.15);
+  padding: 18px;
+  border-radius: 16px;
+  margin-bottom: 16px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 10px;
-  padding: 10px 12px;
-  margin-bottom: 10px;
-  background: #f3e5f5;
-  border-radius: 8px;
-  transition: background 0.2s;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+  animation: softPop 0.25s ease-out;
 }
 
-li:hover {
-  background: #e1bee7;
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* Checkbox */
-li input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+/* Título da tarefa */
+.task-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2e1065;
+}
+
+/* Descrição */
+.task-description {
+  font-size: 15px;
+  color: #4c1d95;
+  line-height: 1.45;
+}
+
+/* ========= CHECKBOX ========= */
+input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
   cursor: pointer;
+  accent-color: #6d28d9;
+  transform: scale(1);
+  transition: 0.3s;
 }
 
-/* Span da tarefa */
-li span {
-  flex: 1;
+input[type="checkbox"]:checked {
+  transform: scale(1.15);
 }
 
-/* Botões dentro da lista */
-li button {
-  font-size: 14px;
-  padding: 6px 10px;
-  border-radius: 6px;
+/* ========= ESTADO COMPLETO ========= */
+.task-completed .task-title,
+.task-completed .task-description {
+  text-decoration: line-through;
+  opacity: 0.45;
 }
 
-/* Botão Editar */
-li button:nth-of-type(2) {
-  background-color: #ffb74d;
-}
-
-li button:nth-of-type(2):hover {
-  background-color: #f57c00;
-}
-
-/* Botão Salvar */
-li button:nth-of-type(3) {
-  background-color: #4caf50;
-  color: white;
-}
-
-li button:nth-of-type(3):hover {
-  background-color: #388e3c;
-}
-
-/* Botão Deletar */
-li button:nth-of-type(4) {
-  background-color: #e57373;
-  color: white;
-}
-
-li button:nth-of-type(4):hover {
-  background-color: #c62828;
+.task-completed {
+  background: linear-gradient(135deg, #f3e8ff, #f8f5ff);
+  border-color: rgba(160, 120, 255, 0.25);
 }

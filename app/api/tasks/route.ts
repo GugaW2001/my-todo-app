@@ -15,9 +15,18 @@ export async function GET() {
 // POST a new task
 export async function POST(req: Request) {
   const body = await req.json();
+
+  const { title, description } = body;
+
   const { data, error } = await supabase
     .from("tasks")
-    .insert([{ title: body.title, completed: false }])
+    .insert([
+      {
+        title,
+        description: description ?? "",
+        completed: false,
+      },
+    ])
     .select("*")
     .single();
 
@@ -25,13 +34,20 @@ export async function POST(req: Request) {
   return NextResponse.json(data);
 }
 
-// PUT to update a task
+// PUT to update a task (title, description, completed)
 export async function PUT(req: Request) {
   const body = await req.json();
+
+  const { id, title, description, completed } = body;
+
   const { data, error } = await supabase
     .from("tasks")
-    .update({ title: body.title, completed: body.completed })
-    .eq("id", body.id)
+    .update({
+      title,
+      description: description ?? "",
+      completed,
+    })
+    .eq("id", id)
     .select("*")
     .single();
 
