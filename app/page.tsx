@@ -18,14 +18,33 @@ export default function Home() {
   const [editingTitle, setEditingTitle] = useState("");
   const [editingDescription, setEditingDescription] = useState("");
 
-  // Load tasks
+  // Load tasks initially and subscribe to SSE for real-time updates
   useEffect(() => {
+    // Initial load
     fetch("/api/tasks")
       .then(res => res.json())
       .then(data => setTasks(data || []));
+
+    // SSE subscription
+    const eventSource = new EventSource("/api/tasks/sse"); // SSE endpoint
+    eventSource.onmessage = (event) => {
+      const updatedTask: Task = JSON.parse(event.data);
+      setTasks(prev => {
+        const exists = prev.find(t => t.id === updatedTask.id);
+        if (exists) {
+          // Update existing
+          return prev.map(t => (t.id === updatedTask.id ? updatedTask : t));
+        } else {
+          // Add new
+          return [updatedTask, ...prev];
+        }
+      });
+    };
+
+    return () => eventSource.close();
   }, []);
 
-  // Add task (title + description)
+  // Add new task
   const addTask = async () => {
     if (!newTitle.trim()) return;
 
@@ -39,7 +58,7 @@ export default function Home() {
     });
 
     const created = await res.json();
-    setTasks([created, ...tasks]);
+    setTasks(prev => [created, ...prev]);
     setNewTitle("");
     setNewDescription("");
   };
@@ -58,7 +77,7 @@ export default function Home() {
     });
 
     const updated = await res.json();
-    setTasks(tasks.map(t => (t.id === task.id ? updated : t)));
+    setTasks(prev => prev.map(t => (t.id === task.id ? updated : t)));
   };
 
   // Save edited task
@@ -77,7 +96,7 @@ export default function Home() {
     });
 
     const updated = await res.json();
-    setTasks(tasks.map(t => (t.id === task.id ? updated : t)));
+    setTasks(prev => prev.map(t => (t.id === task.id ? updated : t)));
     setEditingId(null);
   };
 
@@ -90,7 +109,7 @@ export default function Home() {
     });
 
     const result = await res.json();
-    if (result.success) setTasks(tasks.filter(t => t.id !== task.id));
+    if (result.success) setTasks(prev => prev.filter(t => t.id !== task.id));
   };
 
   return (
@@ -145,13 +164,11 @@ export default function Home() {
               <input type="checkbox" checked={task.completed} onChange={() => toggleComplete(task)} />
 
               {editingId === task.id ? (
-                <>
-                  <input
-                    value={editingTitle}
-                    onChange={e => setEditingTitle(e.target.value)}
-                    style={{ padding: 6, flex: 1 }}
-                  />
-                </>
+                <input
+                  value={editingTitle}
+                  onChange={e => setEditingTitle(e.target.value)}
+                  style={{ padding: 6, flex: 1 }}
+                />
               ) : (
                 <span
                   style={{
