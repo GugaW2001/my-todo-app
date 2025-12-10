@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 
-// Manter uma lista de clientes SSE
+// Lista de clientes SSE
 let clients: any[] = [];
 
-// Função para enviar eventos a todos os clientes conectados
-function broadcastTask(task: any) {
+// Função para broadcast de tarefas
+export function broadcastTask(task: any) {
   clients.forEach((client) => {
     try {
       client.write(`data: ${JSON.stringify(task)}\n\n`);
@@ -26,7 +26,7 @@ export async function GET() {
   return NextResponse.json(data);
 }
 
-// GET para SSE
+// SSE endpoint
 export async function STREAM(req: Request) {
   const { readable, writable } = new TransformStream();
   const writer = writable.getWriter();
@@ -40,12 +40,12 @@ export async function STREAM(req: Request) {
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
     },
   });
 }
 
-// POST a new task
+// POST new task
 export async function POST(req: Request) {
   const body = await req.json();
   const { title, description } = body;
@@ -58,13 +58,11 @@ export async function POST(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Envia o evento SSE
-  broadcastTask(data);
-
+  broadcastTask(data); // envia SSE
   return NextResponse.json(data);
 }
 
-// PUT to update a task (title, description, completed)
+// PUT update task
 export async function PUT(req: Request) {
   const body = await req.json();
   const { id, title, description, completed } = body;
@@ -78,19 +76,20 @@ export async function PUT(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Envia o evento SSE
-  broadcastTask(data);
-
+  broadcastTask(data); // envia SSE
   return NextResponse.json(data);
 }
 
-// DELETE a task
+// DELETE task
 export async function DELETE(req: Request) {
   const body = await req.json();
   const { id } = body;
 
   const { error } = await supabase.from("tasks").delete().eq("id", id);
-
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Notifica remoção (opcional: pode enviar um evento SSE com id removido)
+  broadcastTask({ id, deleted: true });
+
   return NextResponse.json({ success: true });
 }
